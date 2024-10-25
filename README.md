@@ -1,2 +1,1 @@
-# x86_emulator
-x86 emulator
+# x86 Emulator
