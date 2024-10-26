@@ -27,6 +27,10 @@ char* registers_name[] = {
     "EDI"
 };
 
+
+/*
+ * Data structure of emulator
+ */
 typedef struct {
     uint32_t registers[REGISTERS_COUNT];
 
@@ -71,6 +75,9 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
+    /*
+     * Load data into memory
+     */
     fread(emu->memory, 1, 0x200, fp);
     fclose(fp);
 
@@ -79,6 +86,10 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+
+/*
+ * Generate and initialize emulator
+ */
 static emulator* init_emulator(size_t mem_size, uint32_t eip, uint32_t esp) {
 
     /*
