@@ -6,14 +6,15 @@ SRC_DIR := ./src
 SRCS := $(wildcard $(SRC_DIR)/*.c)
 OBJS := $(SRCS:$(SRC_DIR)/%.c=%.o)
 
-$(CC) := gcc
+CC := gcc
 
 .PHONY: all clean distclean
 
 all: $(BUILD_DIR)/$(TARGET)
 
 $(BUILD_DIR)/$(TARGET): $(BUILD_DIR)/$(OBJS)
-	$(CC) $(OBJS) -o $@
+	echo $(BUILD_DIR)/$(OBJS)
+	$(CC) $^ -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c $< -o $@

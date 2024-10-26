@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-enum register {
+#define MEMORY_SIZE 512 * 512
+
+enum x86_register {
     EAX,
     ECX,
     EDX,
@@ -41,14 +43,43 @@ typedef struct {
     uint32_t eip;
 } emulator;
 
-static emulator* init_emu(size_t mem_size, uint32_t eip, uint32_t esp);
-static void      destroy_emu(emulator* emu);
+static emulator* init_emulator(size_t mem_size, uint32_t eip, uint32_t esp);
+static void      destroy_emulator(emulator* emu);
+
+
+
 
 int main(int argc, char* argv[]) {
+    FILE* fp;
+    emulator* emu;
+
+    if (argc != 2) {
+        fprintf(stderr, "usage: x86_emulator filename\n");
+        exit(1);
+    }
+
+    emu = init_emulator(MEMORY_SIZE, 0x0000, 0x7c00);
+
+    char* filename = argv[1];
+    fp = fopen(filename, "rb");
+
+    /*
+     * Error handling for opening file
+     */
+    if (fp == NULL) {
+        fprintf(stderr, "Can not open %s\n", filename);
+        exit(1);
+    }
+
+    fread(emu->memory, 1, 0x200, fp);
+    fclose(fp);
+
+    destroy_emulator(emu);
+
     return 0;
 }
 
-static emulator* init_emu(size_t mem_size, uint32_t eip, uint32_t esp) {
+static emulator* init_emulator(size_t mem_size, uint32_t eip, uint32_t esp) {
 
     /*
      * Generate emulator
@@ -59,9 +90,19 @@ static emulator* init_emu(size_t mem_size, uint32_t eip, uint32_t esp) {
     /*
      * Initialize emulator
      */
-    emu->memory        = (uint8_t*)calloc(sizeof(uint8_t), mem_size);
-    emu->eip           = eip;
-    emu->register[ESP] = esp;
+    emu->memory         = (uint8_t*)calloc(sizeof(uint8_t), mem_size);
+    emu->eip            = eip;
+    emu->registers[ESP] = esp;
+
+    if (emu->memory == NULL) {
+        fprintf(stderr, "Memory not allocated");
+        exit(1);
+    }
 
     return emu;
+}
+
+static void destroy_emulator(emulator* emu) {
+    free(emu->memory);
+    free(emu);
 }
